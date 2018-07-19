@@ -21,7 +21,7 @@ namespace Avalonia.Controls.Presenters
     internal class ItemVirtualizerSimple : ItemVirtualizer
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ItemVirtualizerSimple"/> class.
+        /// Initializes a new instance of the <see cref="ItemVirtualizerRecycling"/> class.
         /// </summary>
         /// <param name="owner"></param>
         public ItemVirtualizerSimple(ItemsPresenter owner)
