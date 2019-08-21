@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 using Avalonia.Controls.Platform;
 
-namespace Avalonia.FreeDesktop.Dbus
+namespace Avalonia.FreeDesktop
 {
     public class LinuxMountedVolumeInfoProvider : IMountedVolumeInfoProvider
     {
