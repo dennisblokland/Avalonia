@@ -3,10 +3,11 @@
 
 using System;
 using System.Threading;
+using Avalonia.Utilities;
 
 namespace Avalonia.Rendering
 {
-    public class ManagedDeferredRendererLock : IDeferredRendererLock
+    public class ManagedDeferredRendererLock : DisposableLock, IDeferredRendererLock
     {
         private readonly object _lock = new object();
 
