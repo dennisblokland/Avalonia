@@ -12,18 +12,11 @@ namespace Avalonia.Controls.Chrome
         private CompositeDisposable _disposables;
         private Window _hostWindow;
 
-        public CaptionButtons(Window hostWindow)
-        {
-            _hostWindow = hostWindow;
-        }
-
-        public void Attach()
+        public void Attach(Window hostWindow)
         {
             if (_disposables == null)
             {
-                var layer = ChromeOverlayLayer.GetOverlayLayer(_hostWindow);
-
-                layer.Children.Add(this);
+                _hostWindow = hostWindow;
 
                 _disposables = new CompositeDisposable
                 {
@@ -32,7 +25,6 @@ namespace Avalonia.Controls.Chrome
                     {
                         Height = x.Top;
                     }),
-
 
                     _hostWindow.GetObservable(Window.ExtendClientAreaTitleBarHeightHintProperty)
                     .Subscribe(x => InvalidateSize()),
