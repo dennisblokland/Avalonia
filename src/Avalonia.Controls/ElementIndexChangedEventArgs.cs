@@ -8,8 +8,7 @@ using System;
 namespace Avalonia.Controls
 {
     /// <summary>
-    /// Provides notification that a recyclable element has been reused to represent a different
-    /// item index.
+    /// Provides notification that the index for a recyclable element has changed.
     /// </summary>
     public class ElementIndexChangedEventArgs : EventArgs
     {
