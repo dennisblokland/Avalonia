@@ -8,6 +8,20 @@
     <converters:CornerRadiusToDoubleConverter x:Key="BottomRightCornerRadius" Corner="BottomRight" />
   </Styles.Resources>
 
+  <Style Selector="Thumb.ColorSliderThumbStyle">
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="10" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <Style Selector="ColorSlider:horizontal">
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="CornerRadius" Value="10" />
@@ -66,7 +80,7 @@
                   </RepeatButton.Template>
                 </RepeatButton>
               </Track.IncreaseButton>
-              <Thumb Classes="SliderThumbStyle"
+              <Thumb Classes="ColorSliderThumbStyle"
                      Name="ColorSliderThumb"
                      Margin="0"
                      Padding="0"
@@ -138,7 +152,7 @@
                   </RepeatButton.Template>
                 </RepeatButton>
               </Track.IncreaseButton>
-              <Thumb Classes="SliderThumbStyle"
+              <Thumb Classes="ColorSliderThumbStyle"
                      Name="ColorSliderThumb"
                      Margin="0"
                      Padding="0"
@@ -153,31 +167,31 @@
   </Style>
 
   <!-- Normal State -->
-  <Style Selector="ColorSlider /template/ Thumb.SliderThumbStyle">
+  <Style Selector="ColorSlider /template/ Thumb.ColorSliderThumbStyle">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="{DynamicResource SliderThumbBackground}" />
     <Setter Property="BorderThickness" Value="3" />
   </Style>
 
   <!-- Selector/Thumb Color -->
-  <Style Selector="ColorSlider:pressed /template/ Thumb.SliderThumbStyle">
+  <Style Selector="ColorSlider:pressed /template/ Thumb.ColorSliderThumbStyle">
     <Setter Property="BorderBrush" Value="{DynamicResource SliderThumbBackgroundPressed}" />
   </Style>
 
-  <Style Selector="ColorSlider:pointerover /template/ Thumb.SliderThumbStyle">
+  <Style Selector="ColorSlider:pointerover /template/ Thumb.ColorSliderThumbStyle">
     <Setter Property="BorderBrush" Value="{DynamicResource SliderThumbBackgroundPointerOver}" />
   </Style>
-  <Style Selector="ColorSlider:pointerover:dark-selector /template/ Thumb.SliderThumbStyle">
+  <Style Selector="ColorSlider:pointerover:dark-selector /template/ Thumb.ColorSliderThumbStyle">
     <Setter Property="Opacity" Value="0.7" />
   </Style>
-  <Style Selector="ColorSlider:pointerover:light-selector /template/ Thumb.SliderThumbStyle">
+  <Style Selector="ColorSlider:pointerover:light-selector /template/ Thumb.ColorSliderThumbStyle">
     <Setter Property="Opacity" Value="0.8" />
   </Style>
 
-  <Style Selector="ColorSlider:dark-selector /template/ Thumb.SliderThumbStyle">
+  <Style Selector="ColorSlider:dark-selector /template/ Thumb.ColorSliderThumbStyle">
     <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundChromeBlackHighBrush}" />
   </Style>
-  <Style Selector="ColorSlider:light-selector /template/ Thumb.SliderThumbStyle">
+  <Style Selector="ColorSlider:light-selector /template/ Thumb.ColorSliderThumbStyle">
     <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundChromeWhiteBrush}" />
   </Style>
 
