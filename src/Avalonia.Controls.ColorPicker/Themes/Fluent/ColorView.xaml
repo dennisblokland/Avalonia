@@ -226,7 +226,6 @@
         <Setter Property="Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPressed}" />
       </Style>
     </Style>
-
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type ColorView}"
