@@ -1,56 +1,38 @@
-﻿:root {
-    --sat: env(safe-area-inset-top);
-    --sar: env(safe-area-inset-right);
-    --sab: env(safe-area-inset-bottom);
-    --sal: env(safe-area-inset-left);
-}
-
-#out {
-    height: 100vh;
-    width: 100vw
-}
-
-#avalonia-splash {
-    position: relative;
+﻿/* HTML styles for the splash screen */
+.avalonia-splash {
+    position: absolute;
     height: 100%;
     width: 100%;
-    color: whitesmoke;
-    background: #171C2C;
+    background: #1b2a4e;
     font-family: 'Nunito', sans-serif;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-
-#avalonia-splash a{
-    color: whitesmoke;
-    text-decoration: none;
-}
-
-.center {
-    display: flex;
     justify-content: center;
-    height: 250px;
+    align-items: center;
+    display: flex;
+    pointer-events: none;
 }
 
-.splash-close {
-    animation: slide 0.5s linear 1s forwards;
+.avalonia-splash h2 {
+    font-size: 1.5rem;
+    color: #8b44ac;
 }
 
-@keyframes slide {
-    0% {
-        top: 0%;
-    }
+.avalonia-splash a {
+    color: white;
+    text-decoration: none;
+    font-size: 2.5rem;
+    display: block;
+}
 
-    50% {
-        opacity: 80%;
-    }
+.avalonia-splash img {
+    opacity: 0.05;
+    height: 35%;
+    position: absolute;
+    right: 3%;
+    bottom: 3%;
+}
 
-    100% {
-        top: 100%;
-        overflow: hidden;
-        opacity: 0;
-        display: none;
-        visibility: collapse;
-    }
+.avalonia-splash.splash-close {
+    transition: opacity 200ms, display 200ms;
+    display: none;
+    opacity: 0;
 }
