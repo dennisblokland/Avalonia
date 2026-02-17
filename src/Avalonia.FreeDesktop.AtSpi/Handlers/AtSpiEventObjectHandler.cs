@@ -6,17 +6,8 @@ using static Avalonia.FreeDesktop.AtSpi.AtSpiConstants;
 
 namespace Avalonia.FreeDesktop.AtSpi.Handlers
 {
-    internal sealed class AtSpiEventObjectHandler : IOrgA11yAtspiEventObject
+    internal sealed class AtSpiEventObjectHandler(AtSpiServer server, string path) : IOrgA11yAtspiEventObject
     {
-        private readonly AtSpiServer _server;
-        private readonly string _path;
-
-        public AtSpiEventObjectHandler(AtSpiServer server, string path)
-        {
-            _server = server;
-            _path = path;
-        }
-
         public uint Version => EventObjectVersion;
 
         public void EmitChildrenChangedSignal(string operation, int indexInParent, DBusVariant child)
@@ -36,15 +27,15 @@ namespace Avalonia.FreeDesktop.AtSpi.Handlers
 
         private void EmitSignal(string member, params object[] body)
         {
-            if (!_server.HasEventListeners)
+            if (!server.HasEventListeners)
                 return;
 
-            var connection = _server.A11yConnection;
+            var connection = server.A11yConnection;
             if (connection is null)
                 return;
 
             var message = DBusMessage.CreateSignal(
-                (DBusObjectPath)_path,
+                (DBusObjectPath)path,
                 IfaceEventObject,
                 member,
                 body);
