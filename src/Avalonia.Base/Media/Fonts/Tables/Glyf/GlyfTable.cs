@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using Avalonia.Platform;
 using Avalonia.Logging;
 
@@ -97,6 +98,126 @@ namespace Avalonia.Media.Fonts.Tables.Glyf
             data = _glyfData.Slice(start, end - start);
 
             return true;
+        }
+
+        /// <summary>
+        /// Reads a glyph's bounding box from its 'glyf' header without parsing contours.
+        /// </summary>
+        /// <remarks>
+        /// The values are the control-point bounding box stored in the glyph header
+        /// (the min/max of all on- and off-curve points), in font design units. This is a
+        /// slight superset of the rendered ink bounds for glyphs with off-curve points.
+        /// Composite glyphs carry their overall bounding box in the header too, so no
+        /// recursion is needed. Returns <see langword="true"/> with all-zero bounds for
+        /// empty glyphs (e.g. whitespace); returns <see langword="false"/> when the glyph
+        /// index is out of range or the glyph data is too short to contain a header.
+        /// </remarks>
+        /// <param name="glyphIndex">The zero-based glyph index.</param>
+        /// <param name="xMin">The minimum x coordinate of the bounding box.</param>
+        /// <param name="yMin">The minimum y coordinate of the bounding box.</param>
+        /// <param name="xMax">The maximum x coordinate of the bounding box.</param>
+        /// <param name="yMax">The maximum y coordinate of the bounding box.</param>
+        /// <returns><see langword="true"/> if bounds were resolved (including empty glyphs); otherwise <see langword="false"/>.</returns>
+        public bool TryGetGlyphBounds(int glyphIndex, out short xMin, out short yMin, out short xMax, out short yMax)
+        {
+            xMin = 0;
+            yMin = 0;
+            xMax = 0;
+            yMax = 0;
+
+            if (!TryGetGlyphData(glyphIndex, out var data))
+            {
+                // Out of range.
+                return false;
+            }
+
+            if (data.IsEmpty)
+            {
+                // Empty glyph (e.g. whitespace): valid, zero bounds.
+                return true;
+            }
+
+            var span = data.Span;
+
+            // Glyph header: int16 numberOfContours, then int16 xMin, yMin, xMax, yMax.
+            if (span.Length < 10)
+            {
+                return false;
+            }
+
+            xMin = BinaryPrimitives.ReadInt16BigEndian(span.Slice(2, 2));
+            yMin = BinaryPrimitives.ReadInt16BigEndian(span.Slice(4, 2));
+            xMax = BinaryPrimitives.ReadInt16BigEndian(span.Slice(6, 2));
+            yMax = BinaryPrimitives.ReadInt16BigEndian(span.Slice(8, 2));
+
+            return true;
+        }
+
+        /// <summary>
+        /// Reads bounding boxes for a batch of glyphs into <paramref name="bounds"/>.
+        /// </summary>
+        /// <remarks>
+        /// The hot path for ink-bounds computation. The <c>glyf</c> and <c>loca</c> spans are
+        /// fetched once for the whole batch (not per glyph), and offsets and headers are read
+        /// directly — no per-glyph <see cref="ReadOnlyMemory{T}.Span"/> conversion, no
+        /// intermediate slices, no nested call chain. Out-of-range, empty, or malformed
+        /// glyphs are written as the default (zero) box.
+        /// </remarks>
+        /// <param name="glyphIndices">The glyph indices to read.</param>
+        /// <param name="bounds">Output; must be at least as long as <paramref name="glyphIndices"/>.</param>
+        public void GetGlyphBounds(ReadOnlySpan<ushort> glyphIndices, Span<GlyphBounds> bounds)
+        {
+            var glyf = _glyfData.Span;
+            var loca = _locaTable.RawData;
+            var shortFormat = _locaTable.IsShortFormat;
+            var glyphCount = _locaTable.GlyphCount;
+            var entrySize = shortFormat ? 2 : 4;
+
+            for (var i = 0; i < glyphIndices.Length; i++)
+            {
+                bounds[i] = default;
+
+                int gid = glyphIndices[i];
+
+                if ((uint)gid >= (uint)glyphCount)
+                {
+                    continue;
+                }
+
+                var locaOffset = gid * entrySize;
+
+                // Need both loca[gid] and loca[gid + 1].
+                if (locaOffset + (2 * entrySize) > loca.Length)
+                {
+                    continue;
+                }
+
+                int start, end;
+
+                if (shortFormat)
+                {
+                    // Short format: uint16 values stored divided by 2
+                    start = BinaryPrimitives.ReadUInt16BigEndian(loca.Slice(locaOffset)) * 2;
+                    end = BinaryPrimitives.ReadUInt16BigEndian(loca.Slice(locaOffset + 2)) * 2;
+                }
+                else
+                {
+                    start = (int)BinaryPrimitives.ReadUInt32BigEndian(loca.Slice(locaOffset));
+                    end = (int)BinaryPrimitives.ReadUInt32BigEndian(loca.Slice(locaOffset + 4));
+                }
+
+                // Empty (start == end) or malformed glyph → leave the zero box.
+                if (end - start < 10 || start < 0 || (uint)end > (uint)glyf.Length)
+                {
+                    continue;
+                }
+
+                bounds[i] = new GlyphBounds(
+                    BinaryPrimitives.ReadInt16BigEndian(glyf.Slice(start + 2)),
+                    BinaryPrimitives.ReadInt16BigEndian(glyf.Slice(start + 4)),
+                    BinaryPrimitives.ReadInt16BigEndian(glyf.Slice(start + 6)),
+                    BinaryPrimitives.ReadInt16BigEndian(glyf.Slice(start + 8)));
+            }
         }
 
         /// <summary>
